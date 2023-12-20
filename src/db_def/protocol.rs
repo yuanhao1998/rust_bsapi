@@ -1,0 +1,8 @@
+// 数据库类型
+const BCT_HEAD_DBTYPE_MQ: u32 = 0x1;
+const BCT_HEAD_DBTYPE_TRDB: u32 = 0x2;
+const BCT_HEAD_DBTYPE_TDB: u32 = 0x3;
+const BCT_HEAD_DBTYPE_SYSTEM: u32 = 0x4;
+
+// 动作类型
+const BCT_HEAD_ACTYPE_OPENMQ: u32 = 0x0001;
