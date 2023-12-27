@@ -2,4 +2,4 @@
 // @Author  : yuanhao1998
 // @Remark  :
 pub mod protocol;
-pub mod err;
+pub mod err_code;

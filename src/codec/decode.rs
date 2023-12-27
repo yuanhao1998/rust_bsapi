@@ -3,7 +3,8 @@
 // @Remark  : 数据解析
 
 use std::io;
-use crate::db_def::err::BS_NOERROR;
+
+use crate::db_def::err_code::BS_NOERROR;
 use crate::err::DBError;
 
 #[derive(Clone, Copy)]
@@ -55,10 +56,10 @@ impl Response {
         }
 
         let data = data[8..self.response_head.unwrap().add_data - 1];
-        if let Ok(data) = std::str::from_utf8(data) {
-            data.split("\0").collect()
-        } else {
-            Err(DBError::ParesData("数据转为utf-8失败"))
+        let data = std::str::from_utf8(data);
+        match data {
+            Ok(data) => {data.split("\0").collect()}
+            Err(e) => {Err(DBError::ParesData(&*format!("数据转为utf-8失败, 错误详情: {}", e)))}
         }
     }
 }
