@@ -2,29 +2,27 @@
 // @Author  : yuanhao1998
 // @Remark  : mq数据库操作方法
 
-use crate::db::connect::Connect;
+use crate::codec::encode::Request;
+use crate::db::connect_pool::ConnPool;
+use crate::db_def::protocol::{BCT_HEAD_ACTYPE_GETMQNAMES, BCT_HEAD_DBTYPE_MQ};
 use crate::err::DBError;
 
 struct MQ<'a> {
     host: &'a str,
     port: u8,
-    conn: Connect<'a>,
 }
 
 impl MQ {
     fn new(host: &str, port: u8) -> MQ {
-        let connect = Connect::new(host, port);
-        match connect {
-            Ok(conn) => {
-                MQ {
-                    host,
-                    port,
-                    conn,
-                }
-            }
-            Err(e) => {Err(DBError::Network(&*format!("连接host:{}, port{}失败, 错误详情: {}", host, port, e)))}
-        }
-
+        MQ {host, port}
     }
-    fn bs_mq_query_all_names(mq: Vec<&str>) {}
+
+    fn bs_mq_query_all_names(&self, mq: Vec<&str>){
+        let mut conn = ConnPool::global().get_conn(self.host, self.port)?;
+        let req = Request::new(BCT_HEAD_DBTYPE_MQ, BCT_HEAD_ACTYPE_GETMQNAMES, 0);
+
+        conn.send_data(req.serialize())?;
+
+        let recv = conn.recv_head();
+    }
 }

@@ -7,6 +7,7 @@ use std::io::{Read, Write};
 use std::net::TcpStream;
 
 use crate::db_def::protocol::{BS_RECV_HEAD_LEN, BS_RECV_DATA_LEN};
+use crate::err::DBError;
 
 pub struct Connect<'a> {
     host: &'a str,
@@ -15,22 +16,22 @@ pub struct Connect<'a> {
 }
 
 impl Connect {
-    pub fn new(host: &str, port: u8) -> Result<Connect, io::Error> {
-        let mut socket = TcpStream::connect(format!("{}:{}", host, port))?;
-
-        Ok(Connect {
-            host,
-            port,
-            socket,
-        })
+    pub fn new(host: &str, port: u8) -> Result<Connect, DBError> {
+        match TcpStream::connect(format!("{}:{}", host, port)) {
+            Ok(socket) => {Ok(Connect{host, port, socket})}
+            Err(e) => {Err(DBError::Network(&format!("连接host：{}, port：{}失败，错误详情：{}", host, port, e)))}
+        }
     }
 
-    pub fn send_data(&mut self, data: &[u8]) -> Result<(), io::Error> {
-        self.socket.write_all(data)
+    pub fn send_data(&mut self, data: &[u8]) -> Result<(), DBError> {
+        match self.socket.write_all(data) {
+            Ok(_) => Ok(()),
+            Err(e) => {Err(DBError::Network(&*format!("发送数据失败，错误详情：{}", e)))}
+        }
     }
 
     pub fn recv_head(&mut self) -> Result<&[u8], io::Error> {
-        return self.recv_data(BS_RECV_HEAD_LEN);
+        self.recv_data(BS_RECV_HEAD_LEN)
     }
 
     pub fn recv_data(&mut self, data_len: usize) -> Result<&[u8], io::Error> {

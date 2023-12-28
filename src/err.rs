@@ -19,6 +19,12 @@ pub enum DBError<'a> {
     // 验证错误
     Valid(&'a str),
 
+    // 格式错误
+    Format(&'a str),
+
+    // 内部错误
+    Internal(&'a str),
+
     // 数据库错误码
     Err(u32)
 }
@@ -30,6 +36,8 @@ impl fmt::Display for DBError{
             DBError::ParesHead(err_msg) => write!(f, "解析响应头出错：{}", err_msg),
             DBError::ParesData(err_msg) => write!(f, "解析响应数据出错：{}", err_msg),
             DBError::Valid(err_msg) => write!(f, "验证错误：{}", err_msg),
+            DBError::Format(err_msg) => write!(f, "格式错误：{}", err_msg),
+            DBError::Internal(err_msg) => write!(f, "内部错误：{}", err_msg),
             DBError::Err(err_code) => write!(f, "错误码：{}", err_code)
         }
     }

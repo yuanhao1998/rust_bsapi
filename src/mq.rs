@@ -5,30 +5,28 @@
 struct MQ<'a> {
     host: &'a str,
     port: u8,
-    pwd: &'a str,
+    pwd: Option<&'a str>,
 }
 
+impl Default for MQ {
+    fn default() -> Self {
+        Self {
+            host: "",
+            port: 0,
+            pwd: None,
+        }
+    }
+}
+
+
 impl MQ {
-
-    // 数据库默认密码都为空，因此new方法默认不需要传递pwd，如有特殊情况，可以使用 new_with_pwd
-    fn new(host: &str, port: u8) -> MQ {
-        let pwd = "";
-        MQ {
-            host,
-            port,
-            pwd,
-        }
+    fn new(host: &str, port: u8, pwd: Option<&str>) -> MQ {
+        let mut mq = MQ::default();
+        mq.host = host;
+        mq.port = port;
+        if pwd != None { mq.pwd = pwd }
+        mq
     }
 
-    fn new_with_pwd(host: &str, port: u8, pwd: &str) -> MQ {
-        MQ {
-            host,
-            port,
-            pwd,
-        }
-    }
-
-    fn mq_list(&self) {
-
-    }
+    fn mq_list(&self) {}
 }
